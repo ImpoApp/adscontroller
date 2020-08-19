@@ -39,25 +39,23 @@ public class adscontroller extends AppCompatActivity{
     }
 
     public void Call_New_Insertial() {
-//        AdRequest adRequest = new AdRequest.Builder()
-//                .build();
-//        interstitialAd.loadAd(adRequest);
+        interstitialAd.loadAd(new AdRequest.Builder()
+                .build());
     }
 
     private void immediateAds() {
-        Toast.makeText(context, "no either", Toast.LENGTH_SHORT).show();
-//        if (interstitialAd != null && interstitialAd.isLoaded()) {
-//            interstitialAd.show();
-//            interstitialAd.setAdListener(new AdListener() {
-//                public void onAdClosed() {
-//                    adsCallback.adscall();
-//                    Call_New_Insertial();
-//                }
-//            });
-//        } else {
-//            Toast.makeText(context, "hero, ", Toast.LENGTH_SHORT).show();
-//            adsCallback.adscall();
-//        }
+        if (interstitialAd != null && interstitialAd.isLoaded()) {
+            interstitialAd.show();
+            interstitialAd.setAdListener(new AdListener() {
+                public void onAdClosed() {
+                    adsCallback.adscall();
+                    Call_New_Insertial();
+                }
+            });
+        } else {
+            Toast.makeText(context, "hero, ", Toast.LENGTH_SHORT).show();
+            adsCallback.adscall();
+        }
     }
 
 }
