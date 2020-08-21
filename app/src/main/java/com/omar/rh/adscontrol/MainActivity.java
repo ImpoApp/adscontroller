@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        ads.initialize();
+        ads.initialize("ca-app-pub-3940256099942544/1033173712");
         ads.Call_New_Insertial();
 
     }
