@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/relativeExFkInt"
+        android:layout_width="match_parent"
+        android:background="#fff"
+        android:visibility="visible"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/fkint"
+            android:scaleType="fitXY"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        <RelativeLayout
+            android:layout_width="70dp"
+            android:layout_height="15dp"
+            android:alpha="0.8"
+            android:layout_alignParentBottom="true">
+            <ImageView
+                android:id="@+id/fkpolicyimg"
+                android:layout_width="70dp"
+                android:visibility="gone"
+                android:layout_alignParentBottom="true"
+                android:scaleType="fitXY"
+                android:onClick="fkpolicypolicy"
+                android:layout_height="15dp" />
+            <ImageView
+                android:id="@+id/add"
+                android:onClick="add"
+                android:layout_alignParentBottom="true"
+                android:scaleType="fitXY"
+                android:layout_width="23dp"
+                android:layout_height="15dp" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/fkinterex"
+            android:layout_width="60dp"
+            android:gravity="center"
+            android:alpha="0"
+            android:layout_alignParentRight="true"
+            android:layout_height="60dp">
+            <TextView
+                android:background="@drawable/fkinterex"
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

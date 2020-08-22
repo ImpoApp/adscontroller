@@ -11,8 +11,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/ads" />
-            <option value="$PROJECT_DIR$/adscontroller" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/unity-adss" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

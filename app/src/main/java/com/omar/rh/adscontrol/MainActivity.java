@@ -16,7 +16,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        ads.initialize("ca-app-pub-3940256099942544/1033173712");
+
+
+        new adscontroller.setAds(this)
+                .Admob_app_id("koskos kabaylos")
+                .Admob_banner("sss")
+                .Admob_inter("ca-app-pub-3940256099942544/1033173712")
+                .Fb_banner("sdsds")
+                .Statut("1")
+                .Housead_banner("sdsd");
+        ads.initialize();
         ads.Call_New_Insertial();
 
     }
@@ -25,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         ads.callBack(new adscontroller.adsCallback() {
             @Override
             public void adscall() {
-//                Toast.makeText(MainActivity.this, "after", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "deeem", Toast.LENGTH_SHORT).show();
             }
         });
     }

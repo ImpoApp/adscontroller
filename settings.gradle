@@ -1,4 +1,3 @@
 rootProject.name='adscontrol'
-include ':app'
-include ':adscontroller'
+include ':app', ':unity-adss'
 include ':ads'
