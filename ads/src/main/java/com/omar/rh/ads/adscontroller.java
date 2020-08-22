@@ -37,8 +37,6 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
-import com.unity3d.ads.IUnityAdsListener;
-import com.unity3d.ads.UnityAds;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
