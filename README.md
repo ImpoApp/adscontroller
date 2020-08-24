@@ -89,7 +89,6 @@
         ads.init();
 
 >- Override your onBackPressed() with this code in every activity class you have
------------------------------------------------------------------
 
                @Override
                   public void onBackPressed() {
@@ -106,20 +105,20 @@
 
 
 
->-  you can show ads relying on your config statut above
------------------------------------------------------------------
+>-  you can show ads depending on your config statut above
+
             ads.showInter();
             ads.showBanners();
             ads.showNative();
 
 >-  OR you can specify your ads statut like that
------------------------------------------------------------------
+
            ads.showInter(2);
            ads.showBanners(2);
-          ads.showNative(2);
+           ads.showNative(2);
 
 >-  if you want a function to perform after showing ads
-----------------------------------------------
+
           ads.callBack(new adscontroller.adsCallback() {
                 @Override
                   public void adscall() {
@@ -132,7 +131,7 @@
                });
 
 >-  You can also change the upcoming statut after click performed by adding statut at the beginning of ads.callBack
-----------------------------------------------
+
           ads.callBack(2,new adscontroller.adsCallback() {
                 @Override
                   public void adscall() {
