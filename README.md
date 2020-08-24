@@ -66,7 +66,7 @@
 
     adscontroller ads = new adscontroller(this);
 
->- Add this in your onCreate method and put your data accordingly
+>- Add this in your onCreate method and put your data accordingly to configure you ads class, do it one time only
 
                 new adscontroller.config()
                 .statut(2)
@@ -83,6 +83,8 @@
                 .housead_inter("")
                 .housead_inter_link("https://google.com")
                 .Housead_banner_link("https://google.com");
+
+>- Add this at the beginning of your activity class to initialize ads class
 
         ads.init();
 
