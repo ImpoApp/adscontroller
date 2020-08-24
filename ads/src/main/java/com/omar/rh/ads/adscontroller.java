@@ -808,10 +808,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
 
     public static class config {
-
-        private final Context context;
-        public config(Context context) {
-            this.context = context;
+        public config() {
         }
 
         public config admob_app_id(String admob_app_id) {
