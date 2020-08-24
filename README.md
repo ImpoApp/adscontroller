@@ -37,20 +37,20 @@
 
 >- To show Banner add this to your XML  ->
 
-            <LinearLayout
-            android:id="@+id/banners"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+        <LinearLayout
+        android:id="@+id/banners"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 
 >- To show Native add this to your XML  ->
             
-            <LinearLayout
-            android:id="@+id/natives"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/> 
+        <LinearLayout
+        android:id="@+id/natives"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/> 
 
 >- To show House Ads Interstitial, your XML needs to start with RelativeLayout and add this to the end of your XML just before the closing tag of RelativeLayout ->
 
@@ -68,40 +68,40 @@
 
 >- Add this in your onCreate method and put your data accordingly to configure you ads class, do it one time only
 
-                new adscontroller.config()
-                .statut(2)
-                .admob_app_id("ca-app-pub-3940256099942544")
-                .admob_inter("ca-app-pub-3940256099942544/1033173712")
-                .admob_banner("ca-app-pub-3940256099942544/6300978111")
-                .admob_native("ca-app-pub-3940256099942544/2247696110")
-                .fb_inter("")
-                .Fb_banner("")
-                .fb_native("")
-                .Unity_app_id("")
-                .unity_inter("")
-                .housead_banner("")
-                .housead_inter("")
-                .housead_inter_link("https://google.com")
-                .Housead_banner_link("https://google.com");
+    new adscontroller.config()
+       .statut(2)
+       .admob_app_id("ca-app-pub-3940256099942544")
+       .admob_inter("ca-app-pub-3940256099942544/1033173712")
+       .admob_banner("ca-app-pub-3940256099942544/6300978111")
+       .admob_native("ca-app-pub-3940256099942544/2247696110")
+       .fb_inter("")
+       .Fb_banner("")
+       .fb_native("")
+       .Unity_app_id("")
+       .unity_inter("")
+       .housead_banner("")
+       .housead_inter("")
+       .housead_inter_link("https://google.com")
+       .Housead_banner_link("https://google.com");
 
 >- Add this at the beginning of your activity class to initialize ads class
 
-        ads.init();
+       ads.init();
 
 >- Override your onBackPressed() with this code in every activity class you have
 
-               @Override
-                  public void onBackPressed() {
-                    ads.onBakcoverride(new adscontroller.onBakcoverride() {
-                   @Override
-                     public void callBack() {
-                      // TODO: --> you can replace the below code with your own code
+        @Override
+          public void onBackPressed() {
+            ads.onBakcoverride(new adscontroller.onBakcoverride() {
+              @Override
+                public void callBack() {
+                 // TODO: --> you can replace the below code with your own code
 
-                      // Replace ClassName with this class name
-                     MainActivity.super.onBackPressed();
-                   }
-               });
-            }
+                 // Replace ClassName with this class name
+                  MainActivity.super.onBackPressed();
+              }
+           });
+          }
 
 
 
