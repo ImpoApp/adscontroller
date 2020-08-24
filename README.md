@@ -106,7 +106,7 @@
                    }
                });
 
->-  You can also change the upcoming statut after click performer by adding statut at the begging of ads.callBack
+>-  You can also change the upcoming statut after click performed by adding statut at the beginning of ads.callBack
 ----------------------------------------------
           ads.callBack(2,new adscontroller.adsCallback() {
                 @Override
