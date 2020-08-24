@@ -2,13 +2,37 @@
 
 <h2> GRADLE </h2>
 
->- Add these libraries to your gradle 
+>- Add these libraries to your gradle (Module)
 
     implementation 'com.github.omariorh:adscontroller:2.0.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'com.unity3d.ads:unity-ads:3.4.8'
     implementation 'com.facebook.android:audience-network-sdk:5.+'
     implementation 'com.google.android.gms:play-services-ads:17.1.0'
+    
+>- Add maven { url 'https://jitpack.io' } to your gradle (Project) inside allprojects -> repositories like this:
+
+    allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        
+    }
+}
+
+<h2> MANIFEST </h2>
+
+>- Add these persmissions in your manifest  ->
+
+      <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+      
+>- Add meta data for Admob in your manifest inside application tag  ->      
+
+     <meta-data
+        android:name="com.google.android.gms.ads.APPLICATION_ID"
+        android:value="ca-app-pub-4132316188280309~1229123683" />
 
 <h2> XML </h2>
 
