@@ -63,7 +63,7 @@
 
 <h2> JAVA CLASS </h2>
 
->- Add this in the bigging of your class activity
+>- Add this at the beginning of your activity class 
 
     adscontroller ads = new adscontroller(this);
 
@@ -87,7 +87,7 @@
 
         ads.init();
 
->- Override your onBackPressed() with this code
+>- Override your onBackPressed() with this code in every activity class you have
 -----------------------------------------------------------------
 
                @Override
