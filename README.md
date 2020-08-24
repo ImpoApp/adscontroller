@@ -1,4 +1,4 @@
-<h4>
+<h3>
 
 <h2> GRADLE </h2>
 
@@ -36,11 +36,8 @@
         android:id="@+id/housead_inter_xml"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-<h4>
 
 <h2> JAVA CLASS </h2>
-
-<h3>
 
 >- Add this in the bigging of your class activity
 
@@ -129,7 +126,5 @@
 *3 = UNITY ADS*
 
 *4 = HOUSE ADS (yours)*
-
-
 
 </h3>
