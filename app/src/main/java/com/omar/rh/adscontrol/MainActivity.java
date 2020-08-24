@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,28 +20,35 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        new adscontroller.setAds(this)
-                .Statut("3")
+        new adscontroller.config(this)
+                .statut(1)
+                .admob_app_id("ca-app-pub-3940256099942544")
+                .admob_inter("ca-app-pub-3940256099942544/1033173712")
+                .admob_banner("ca-app-pub-3940256099942544/6300978111")
+                .admob_native("ca-app-pub-3940256099942544/2247696110")
+                .fb_inter("IMG_16_9_APP_INSTALL#760988004308874_760988490975492")
+                .Fb_banner("IMG_16_9_APP_INSTALL#760988004308874_760990247641983")
+                .fb_native("IMG_16_9_APP_INSTALL#760988004308874_803370760070598")
                 .Unity_app_id("3680887")
-                .Unity_inter("video")
-                .Admob_inter("ca-app-pub-3940256099942544/1033173712")
-                .Admob_banner("ca-app-pub-3940256099942544/6300978111")
-                .Housead_banner("https://i.ibb.co/P9tGZND/manebnr1.gif")
-                .Housead_inter("https://i.ibb.co/7rsCZRp/bdint.gif")
-                .Housead_inter_link("https://i.ibb.co/7rsCZRp/bdint.gif")
+                .unity_inter("video")
+                .housead_banner("https://i.ibb.co/P9tGZND/manebnr1.gif")
+                .housead_inter("https://i.ibb.co/7rsCZRp/bdint.gif")
+                .housead_inter_link("https://i.ibb.co/7rsCZRp/bdint.gif")
                 .Housead_banner_link("https://google.com");
 
-        ads.initialize();
-        ads.Call_New_Insertial();
+        ads.init();
+        ads.showInter(4);
         ads.showBanners();
+        ads.showNative();
     }
 
     public void clickme(View view) {
-        ads.callBack(new adscontroller.adsCallback() {
+        ads.callBack(3,new adscontroller.adsCallback() {
             @Override
             public void adscall() {
-//                Toast.makeText(MainActivity.this, "good for you", Toast.LENGTH_SHORT).show();
-                ads.showBanners("1");
+                Toast.makeText(MainActivity.this, "good for you", Toast.LENGTH_SHORT).show();
+                ads.showNative();
+                ads.showBanners();
             }
         });
     }

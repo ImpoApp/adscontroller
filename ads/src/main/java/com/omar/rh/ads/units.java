@@ -1,6 +1,6 @@
 package com.omar.rh.ads;
 
-public class config {
+public class units {
 
 
     public static String Admob_app_id = "";
@@ -18,7 +18,7 @@ public class config {
     public static String Housead_inter_link = "";
     public static String Housead_banner_link = "";
     public static String Housead_privacy_policy = "";
-    public static String statut = "";
+    public static int statut = 0;
 
 
     public static int interval = 1;

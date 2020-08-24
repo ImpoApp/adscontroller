@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +16,6 @@ import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.facebook.ads.Ad;
@@ -44,33 +42,36 @@ import com.unity3d.ads.UnityAds;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import static com.facebook.ads.AdSettings.IntegrationErrorMode.INTEGRATION_ERROR_CRASH_DEBUG_MODE;
-import static com.omar.rh.ads.config.Admob_app_id;
-import static com.omar.rh.ads.config.Admob_banner;
-import static com.omar.rh.ads.config.Admob_inter;
-import static com.omar.rh.ads.config.Admob_native;
-import static com.omar.rh.ads.config.Fb_banner;
-import static com.omar.rh.ads.config.Fb_inter;
-import static com.omar.rh.ads.config.Fb_native;
-import static com.omar.rh.ads.config.Housead_banner;
-import static com.omar.rh.ads.config.Housead_banner_link;
-import static com.omar.rh.ads.config.Housead_inter_link;
-import static com.omar.rh.ads.config.Housead_inter;
-import static com.omar.rh.ads.config.Housead_privacy_policy;
-import static com.omar.rh.ads.config.Unity_app_id;
-import static com.omar.rh.ads.config.Unity_inter;
-import static com.omar.rh.ads.config.isFk_inter;
-import static com.omar.rh.ads.config.interval;
-import static com.omar.rh.ads.config.statut;
+import static com.omar.rh.ads.units.Admob_app_id;
+import static com.omar.rh.ads.units.Admob_banner;
+import static com.omar.rh.ads.units.Admob_inter;
+import static com.omar.rh.ads.units.Admob_native;
+import static com.omar.rh.ads.units.Fb_banner;
+import static com.omar.rh.ads.units.Fb_inter;
+import static com.omar.rh.ads.units.Fb_native;
+import static com.omar.rh.ads.units.Housead_banner;
+import static com.omar.rh.ads.units.Housead_banner_link;
+import static com.omar.rh.ads.units.Housead_inter_link;
+import static com.omar.rh.ads.units.Housead_inter;
+import static com.omar.rh.ads.units.Housead_privacy_policy;
+import static com.omar.rh.ads.units.Unity_app_id;
+import static com.omar.rh.ads.units.Unity_inter;
+import static com.omar.rh.ads.units.isFk_inter;
+import static com.omar.rh.ads.units.interval;
+import static com.omar.rh.ads.units.statut;
 
 public class adscontroller extends AppCompatActivity implements IUnityAdsListener{
 
+    public String TAG = this.getClass().getSimpleName();
     Context context;
     Activity activity;
-    private setAds setAds;
+    private config config;
+    Boolean isNative = false;
+    Boolean isBanner = false;
+    Boolean isHouseadInter = false;
 
     //Admob
     public InterstitialAd interstitialAd;
@@ -116,9 +117,8 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
 
 
-    public void initialize() {
+    public void init() {
         activity = (Activity) context;
-
 
 //        // >> Unity
         unityGameID = Unity_app_id;
@@ -135,12 +135,10 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         interstitialAd = new InterstitialAd(context);
         interstitialAd.setAdUnitId(Admob_inter);
 
-        try {
-            fk_int_init();
-            setBanners();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        setNative();
+        setBanners();
+        fk_int_init();
+        loadInterAds();
 
     }
 
@@ -159,78 +157,76 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         return this;
     }
 
-
-    //    public void onBackPressedFunc() {
-//
-//    }
-
     public void fk_int_init() {
-        housead_inter_xml = this.activity.findViewById(R.id.housead_inter_xml);
-        View view = View.inflate(context, R.layout.fk_inter, null);
-        housead_inter_xml.addView(view);
-        housead_inter_xml.setVisibility(View.GONE);
+        try {
+            housead_inter_xml = this.activity.findViewById(R.id.housead_inter_xml);
+            View view = View.inflate(context, R.layout.fk_inter, null);
+            housead_inter_xml.addView(view);
+            housead_inter_xml.setVisibility(View.GONE);
 
-        RelativeExFkInt = this.activity.findViewById(R.id.relativeExFkInt);
-        fkinterex = (LinearLayout) this.activity.findViewById(R.id.fkinterex);
-        fkint = (ImageView) this.activity.findViewById(R.id.fkint);
-        fk_policy_img = (ImageView) this.activity.findViewById(R.id.fkpolicyimg);
-        add = this.activity.findViewById(R.id.add);
-
-
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (expandadd) {
-                    fk_policy_img.setVisibility(View.GONE);
-                    expandadd = false;
-                } else {
-                    fk_policy_img.setVisibility(View.VISIBLE);
-                    expandadd = true;
-                }
-            }
-        });
-
-        fk_policy_img.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Intent viewIntent =
-                            new Intent("android.intent.action.VIEW",
-                                    Uri.parse(Housead_privacy_policy));
-                    context.startActivity(viewIntent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+            RelativeExFkInt = this.activity.findViewById(R.id.relativeExFkInt);
+            fkinterex = (LinearLayout) this.activity.findViewById(R.id.fkinterex);
+            fkint = (ImageView) this.activity.findViewById(R.id.fkint);
+            fk_policy_img = (ImageView) this.activity.findViewById(R.id.fkpolicyimg);
+            add = this.activity.findViewById(R.id.add);
 
 
-        fkint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Intent viewIntent =
-                            new Intent("android.intent.action.VIEW",
-                                    Uri.parse(Housead_inter_link));
-                    context.startActivity(viewIntent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        fkinterex.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                RelativeExFkInt.animate().alpha(0).setDuration(300);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        fk_int_callback();
+            add.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (expandadd) {
+                        fk_policy_img.setVisibility(View.GONE);
+                        expandadd = false;
+                    } else {
+                        fk_policy_img.setVisibility(View.VISIBLE);
+                        expandadd = true;
                     }
-                }, 300);
-            }
-        });
+                }
+            });
+
+            fk_policy_img.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        context.startActivity(new Intent("android.intent.action.VIEW",
+                                Uri.parse(Housead_privacy_policy)));
+                    } catch (Exception e) {
+                        Log.d(TAG,"Check the housead privacy url is empty");
+                    }
+                }
+            });
+
+
+            fkint.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        context.startActivity(new Intent("android.intent.action.VIEW",
+                                Uri.parse(Housead_inter_link)));
+                    } catch (Exception e) {
+                        Log.d(TAG,"Check the housead interstitial url is empty");
+                    }
+                }
+            });
+
+            fkinterex.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    RelativeExFkInt.animate().alpha(0).setDuration(300);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            fk_int_callback();
+                        }
+                    }, 300);
+                }
+            });
+            isHouseadInter = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            isHouseadInter = false;
+            Log.d(TAG,"You need to add Housead Interstitial in your xml");
+        }
     }
 
 
@@ -238,91 +234,126 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         housead_inter_xml.setVisibility(View.GONE);
         RelativeExFkInt.animate().alpha(1);
         isFk_inter = false;
-        adsCallback.adscall();
+        interCallBack();
+    }
+
+    private void interCallBack() {
+        try {
+            adsCallback.adscall();
+        } catch (Exception e) {
+        }
     }
 
     public void setNative() {
 
-        nativecont = this.activity.findViewById(R.id.nativecont);
-        View view = View.inflate(context, R.layout.nativecountainer, null);
-        nativecont.addView(view);
-        nativeAdLayout = this.activity.findViewById(R.id.native_ad_container);
-        scrollViewFb = this.activity.findViewById(R.id.scrollViewFb);
-        scrollViewAdm = this.activity.findViewById(R.id.scrollViewAdm);
-        nativeAdLayoutAdm = this.activity.findViewById(R.id.id_native_ad);
+        try {
+            nativecont = this.activity.findViewById(R.id.natives);
+            View view = View.inflate(context, R.layout.nativecountainer, null);
+            nativecont.addView(view);
+            nativeAdLayout = this.activity.findViewById(R.id.native_ad_container);
+            scrollViewFb = this.activity.findViewById(R.id.scrollViewFb);
+            scrollViewAdm = this.activity.findViewById(R.id.scrollViewAdm);
+            nativeAdLayoutAdm = this.activity.findViewById(R.id.id_native_ad);
+            isNative = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, "You need to add a Linear Layout for native in your xml");
+            isNative = false;
+        }
+    }
+
+
+    public void showNative() {
+        callNativeFunc(statut);
+    }
+
+    public void showNative(int statut) {
+        callNativeFunc(statut);
+    }
+
+
+    private void callNativeFunc(int statut){
+        if (isNative) {
+            switch (statut) {
+                case 1:
+                    Admob_native_loader();
+                    break;
+                case 2:
+                    loadNativeFbAd();
+                    break;
+                default:
+                    scrollViewAdm.setVisibility(View.GONE);
+                    scrollViewFb.setVisibility(View.GONE);
+
+            }
+        }
     }
 
     public void setBanners() {
-        //banners
-        mybanners = this.activity.findViewById(R.id.banners);
-        View view = View.inflate(context, R.layout.bannercountainer, null);
-        mybanners.addView(view);
-        adContainer = this.activity.findViewById(R.id.banner_container);
-        separator = this.activity.findViewById(R.id.separator);
-        bnlinear = this.activity.findViewById(R.id.bnrlinear);
+        try {
+            //banners
+            mybanners = this.activity.findViewById(R.id.banners);
+            View view = View.inflate(context, R.layout.bannercountainer, null);
+            mybanners.addView(view);
+            adContainer = this.activity.findViewById(R.id.banner_container);
+            separator = this.activity.findViewById(R.id.separator);
+            bnlinear = this.activity.findViewById(R.id.bnrlinear);
 
-        //        nativeAdLayout = this.activity.findViewById(R.id.native_ad_container);
-        //        scrollViewAdm = this.activity.findViewById(R.id.scrollViewAdm);
-        //        scrollViewFb = this.activity.findViewById(R.id.scrollViewFb);
-        //        nativeAdLayoutAdm = this.activity.findViewById(R.id.id_native_ad);
+            // ->Facebook
+            adView = new com.facebook.ads.AdView(context, Fb_banner, AdSize.BANNER_HEIGHT_50);
 
-        // add unit to banners
+            // ->Admob
+            mAdView2 = new com.google.android.gms.ads.AdView(context);
+            mAdView2.setAdSize(com.google.android.gms.ads.AdSize.SMART_BANNER);
+            mAdView2.setAdUnitId(Admob_banner);
 
-        // ->Facebook
-        adView = new com.facebook.ads.AdView(context, Fb_banner, AdSize.BANNER_HEIGHT_50);
+            // houseAds
+            relat = this.activity.findViewById(R.id.relt);
+            fakebnr = this.activity.findViewById(R.id.fakebnr);
+            fkpolicyimgbnr = this.activity.findViewById(R.id.fkpolicyimgbnr);
+            addbnr = this.activity.findViewById(R.id.addbnr);
 
-        // ->Admob
-        mAdView2 = new com.google.android.gms.ads.AdView(context);
-        mAdView2.setAdSize(com.google.android.gms.ads.AdSize.SMART_BANNER);
-        mAdView2.setAdUnitId(Admob_banner);
-
-        // fkads
-
-        relat = this.activity.findViewById(R.id.relt);
-        fakebnr = this.activity.findViewById(R.id.fakebnr);
-        fkpolicyimgbnr = this.activity.findViewById(R.id.fkpolicyimgbnr);
-        addbnr = this.activity.findViewById(R.id.addbnr);
-
-        fkpolicyimgbnr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Intent viewIntent =
-                            new Intent("android.intent.action.VIEW",
-                                    Uri.parse(Housead_privacy_policy));
-                    context.startActivity(viewIntent);
-                } catch (Exception e) {
-                    e.printStackTrace();
+            fkpolicyimgbnr.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        context.startActivity(new Intent("android.intent.action.VIEW",
+                                Uri.parse(Housead_privacy_policy)));
+                    } catch (Exception e) {
+                        Log.d(TAG,"Check the housead privacy url is empty");
+                    }
                 }
-            }
-        });
+            });
 
-        addbnr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (expandaddbnr) {
-                    fkpolicyimgbnr.setVisibility(View.GONE);
-                    expandaddbnr = false;
-                } else {
-                    fkpolicyimgbnr.setVisibility(View.VISIBLE);
-                    expandaddbnr = true;
+            addbnr.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (expandaddbnr) {
+                        fkpolicyimgbnr.setVisibility(View.GONE);
+                        expandaddbnr = false;
+                    } else {
+                        fkpolicyimgbnr.setVisibility(View.VISIBLE);
+                        expandaddbnr = true;
+                    }
                 }
-            }
-        });
+            });
 
-        fakebnr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Intent viewIntent =
-                            new Intent("android.intent.action.VIEW",
-                                    Uri.parse(Housead_banner_link));
-                    context.startActivity(viewIntent);
-                } catch (Exception e) {
-                    e.printStackTrace();
+            fakebnr.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        context.startActivity(new Intent("android.intent.action.VIEW",
+                                Uri.parse(Housead_banner_link)));
+                    } catch (Exception e) {
+                        Log.d(TAG,"Check the housead banner url is empty");
+                    }
                 }
-            }
-        });
+            });
+            isBanner = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            isBanner = false;
+        }
 
     }
 
@@ -330,49 +361,49 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         showBannersFunction(statut);
     }
 
-    public void showBanners(String statut) {
+    public void showBanners(int statut) {
         showBannersFunction(statut);
     }
 
-    private void showBannersFunction(String statut){
-
-        switch (Integer.valueOf(statut)) {
-            case 1:
-                admBnr();
-//                admNativeLoader();
-                relat.setVisibility(View.GONE);
-                adContainer.setVisibility(View.GONE);
-                separator.setVisibility(View.VISIBLE);
-//                scrollViewAdm.setVisibility(View.VISIBLE);
-//                scrollViewFb.setVisibility(View.GONE);
-                break;
-            case 2:
-                relat.setVisibility(View.GONE);
-                adContainer.setVisibility(View.VISIBLE);
-                separator.setVisibility(View.VISIBLE);
-                bnlinear.setVisibility(View.GONE);
-//                scrollViewAdm.setVisibility(View.GONE);
-//                scrollViewFb.setVisibility(View.VISIBLE);
-                if (hasAdView == 0) {
-                    adContainer.removeAllViews();
-                    adContainer.addView(adView);
-                    adView.loadAd();
-                    hasAdView = 1;
-                }
-                break;
-            case 4:
-                bnlinear.setVisibility(View.GONE);
-                separator.setVisibility(View.VISIBLE);
-                adContainer.setVisibility(View.GONE);
-                get_fk_bnr();
-                break;
-            default:
-                relat.setVisibility(View.GONE);
-                adContainer.setVisibility(View.GONE);
-                bnlinear.setVisibility(View.GONE);
-                separator.setVisibility(View.GONE);
-//                scrollViewFb.setVisibility(View.GONE);
-//                scrollViewAdm.setVisibility(View.GONE);
+    private void showBannersFunction(int statut){
+        if (isBanner) {
+            switch (Integer.valueOf(statut)) {
+                case 1:
+                    admBnr();
+    //                admNativeLoader();
+                    relat.setVisibility(View.GONE);
+                    adContainer.setVisibility(View.GONE);
+                    separator.setVisibility(View.VISIBLE);
+                    break;
+                case 2:
+                    relat.setVisibility(View.GONE);
+                    adContainer.setVisibility(View.VISIBLE);
+                    separator.setVisibility(View.VISIBLE);
+                    bnlinear.setVisibility(View.GONE);
+                    if (hasAdView == 0) {
+                        adContainer.removeAllViews();
+                        adContainer.addView(adView);
+                        adView.loadAd();
+                        hasAdView = 1;
+                    }
+                    break;
+                case 4:
+                    bnlinear.setVisibility(View.GONE);
+                    separator.setVisibility(View.GONE);
+                    adContainer.setVisibility(View.GONE);
+                    if (!Housead_banner.equals("")){
+                        separator.setVisibility(View.VISIBLE);
+                        get_fk_bnr();
+                    }else{
+                        Log.d(TAG,"Housead Banner didn't load, check the image url");
+                    }
+                    break;
+                default:
+                    relat.setVisibility(View.GONE);
+                    adContainer.setVisibility(View.GONE);
+                    bnlinear.setVisibility(View.GONE);
+                    separator.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -380,13 +411,20 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         void adscall();
     }
 
-    public adscontroller callBack(adscontroller.adsCallback listener) {
+    public adscontroller callBack(int changeUpcomingStatut,adscontroller.adsCallback listener) {
         adsCallback = listener;
-        intentStar();
+        intentStar(statut);
+        statut = changeUpcomingStatut;
         return this;
     }
 
-    public void Call_New_Insertial() {
+    public adscontroller callBack(adscontroller.adsCallback listener) {
+        adsCallback = listener;
+        intentStar(statut);
+        return this;
+    }
+
+    public void loadInterAds() {
         switch (Integer.valueOf(statut)) {
             case 1:
                 AdRequest adRequest = new AdRequest.Builder()
@@ -401,7 +439,6 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                 }
                 break;
             case 3:
-                Log.d("here: loding int unity", unityInter);
                 try {
                     UnityAds.load(unityInter);
                 } catch (Exception e) {
@@ -417,26 +454,33 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         }
     }
 
-    public void intentStar() {
+    public void intentStar(int statut) {
 //        Toast.makeText(context, Admob_app_id, Toast.LENGTH_SHORT).show();
         immediateAds(statut);
     }
 
+    public void showInter(){
+        immediateAds(statut);
+    }
 
-    private void immediateAds(final String statut) {
-        switch (Integer.valueOf(statut)) {
+    public void showInter(int statut){
+        immediateAds(statut);
+    }
+
+    private void immediateAds(int statut) {
+        switch (statut) {
             case 1:
                 if (interstitialAd != null && interstitialAd.isLoaded()) {
                     interstitialAd.show();
                     interstitialAd.setAdListener(new AdListener() {
                         public void onAdClosed() {
-                            adsCallback.adscall();
-                            Call_New_Insertial();
+                            interCallBack();
+                            loadInterAds();
                         }
                     });
                 } else {
-                    adsCallback.adscall();
-                    Call_New_Insertial();
+                    interCallBack();
+                    loadInterAds();
                 }
                 break;
             case 2:
@@ -465,25 +509,35 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
                         @Override
                         public void onInterstitialDismissed(Ad ad) {
-                            adsCallback.adscall();
-                            Call_New_Insertial();
+                            interCallBack();
+                            loadInterAds();
                         }
                     });
                 } else {
-                    adsCallback.adscall();
-                    Call_New_Insertial();
+                    interCallBack();
+                    loadInterAds();
                 }
                 break;
             case 3:
                 UnityInterDisplay();
-                adsCallback.adscall();
+                interCallBack();
                 break;
             case 4:
-                get_fk_int();
+                if (isHouseadInter) {
+                    if (!Housead_inter.equals("")) {
+                        show_housead_inter();
+                    }else{
+                        Log.d(TAG,"Housead Interstitial didn't load, check the image url");
+                        interCallBack();
+                    }
+                }else{
+                    interCallBack();
+                    Log.d(TAG,"You need to add Housead Interstitial in your xml");
+                }
                 break;
             default:
-                adsCallback.adscall();
-                Call_New_Insertial();
+                interCallBack();
+                loadInterAds();
                 interval = 1;
         }
     }
@@ -550,11 +604,6 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     public void loadNativeFbAd() {
         scrollViewAdm.setVisibility(View.GONE);
         scrollViewFb.setVisibility(View.VISIBLE);
-        // Instantiate a NativeAd object.
-        // NOTE: the placement ID will eventually identify this as your App, you can ignore it for
-        // now, while you are testing and replace it later when you have signed up.
-        // While you are using this temporary code you will only get test ads and if you release
-        // your code like this to the Google Play your users will not receive ads (you will get a no fill error).
         nativeAd = new com.facebook.ads.NativeAd(context, Fb_native);
 
         nativeAd.setAdListener(new NativeAdListener() {
@@ -574,8 +623,6 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
             public void onAdLoaded(Ad ad) {
                 // Native ad is loaded and ready to be displayed
                 Log.d("ads", "Native ad is loaded and ready to be displayed!");
-
-                // Race condition, load() called again before last ad was displayed
                 if (nativeAd == null || nativeAd != ad) {
                     return;
                 }
@@ -648,23 +695,9 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                 clickableViews);
     }
 
-    public void Show_native(int pos) {
-        switch (pos) {
-            case 1:
-                Admob_nativee_loader();
-                break;
-            case 2:
-                loadNativeFbAd();
-                break;
-            default:
-                scrollViewAdm.setVisibility(View.GONE);
-                scrollViewFb.setVisibility(View.GONE);
 
-        }
 
-    }
-
-    public void Admob_nativee_loader() {
+    public void Admob_native_loader() {
         scrollViewFb.setVisibility(View.GONE);
         scrollViewAdm.setVisibility(View.VISIBLE);
         AdLoader adLoader = new AdLoader.Builder(context, Admob_native)
@@ -759,24 +792,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         Glide.with(context).load(Housead_banner).thumbnail(0.01f).into(fakebnr);
     }
 
-    public void getbnr() {
-        bnlinear.setVisibility(View.VISIBLE);
-        final com.google.android.gms.ads.AdView mAdView2 = new com.google.android.gms.ads.AdView(this);
-        AdRequest adRequest2 = new AdRequest.Builder().build();
-        mAdView2.setAdSize(com.google.android.gms.ads.AdSize.SMART_BANNER);
-        mAdView2.setAdUnitId(Admob_banner);
-        AdRequest addRequest2 = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
-        if (mAdView2.getAdSize() != null || mAdView2.getAdUnitId() != null)
-            mAdView2.loadAd(addRequest2);
-        // else Log state of adsize/adunit
-        ((LinearLayout) findViewById(R.id.adlinear)).removeAllViews();
-        ((LinearLayout) findViewById(R.id.adlinear)).addView(mAdView2);
-    }
-
-
-    public void get_fk_int() {
+    public void show_housead_inter() {
         isFk_inter = true;
         RelativeExFkInt.setVisibility(View.VISIBLE);
         housead_inter_xml.setVisibility(View.VISIBLE);
@@ -791,81 +807,86 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
 
 
-    public static class setAds {
+    public static class config {
 
         private final Context context;
-        public setAds(Context context) {
+        public config(Context context) {
             this.context = context;
         }
 
-        public setAds Admob_app_id(String admob_app_id) {
+        public config admob_app_id(String admob_app_id) {
             Admob_app_id = admob_app_id;
             return this;
         }
 
-        public setAds Admob_inter(String admob_inter) {
+        public config admob_inter(String admob_inter) {
             Admob_inter = admob_inter;
             return this;
         }
 
-        public setAds Admob_banner(String admob_banner) {
+        public config admob_banner(String admob_banner) {
             Admob_banner = admob_banner;
             return this;
         }
 
-        public setAds Fb_inter(String fb_inter) {
+        public config admob_native(String admob_native) {
+            Admob_native = admob_native;
+            return this;
+        }
+
+        public config fb_inter(String fb_inter) {
             Fb_inter = fb_inter;
             return this;
         }
 
-        public setAds Fb_banner(String fb_banner) {
+        public config Fb_banner(String fb_banner) {
             Fb_banner = fb_banner;
             return this;
         }
 
-        public setAds Fb_native(String fb_native) {
+        public config fb_native(String fb_native) {
             Fb_native = fb_native;
             return this;
         }
 
-        public setAds Unity_app_id(String unity_app_id) {
+        public config Unity_app_id(String unity_app_id) {
             Unity_app_id = unity_app_id;
             return this;
         }
 
-        public setAds Unity_inter(String unity_inter) {
+        public config unity_inter(String unity_inter) {
             Unity_inter = unity_inter;
             return this;
         }
 
-        public setAds Housead_banner(String housead_banner) {
+        public config housead_banner(String housead_banner) {
             Housead_banner = housead_banner;
             return this;
         }
 
-        public setAds Housead_inter(String housead_inter) {
+        public config housead_inter(String housead_inter) {
             Housead_inter = housead_inter;
             return this;
         }
 
-        public setAds Housead_banner_link(String housead_banner_link) {
+        public config Housead_banner_link(String housead_banner_link) {
             Housead_banner_link = housead_banner_link;
             return this;
         }
 
-        public setAds Housead_inter_link(String housead_inter_link) {
+        public config housead_inter_link(String housead_inter_link) {
             Housead_inter_link = housead_inter_link;
             return this;
         }
 //
-        public setAds Statut(String statut) {
-            config.statut = statut;
+        public config statut(int statut) {
+            units.statut = statut;
             return this;
         }
 
 //
-        public setAds privacy_url(String privacy_url) {
-            config.privacy_url = privacy_url;
+        public config privacy_url(String privacy_url) {
+            units.privacy_url = privacy_url;
             return this;
         }
 
