@@ -15,7 +15,6 @@
 >- To show Banner add this to your XML  ->
 
             <LinearLayout
-            android:layout_marginTop="10dp"
             android:id="@+id/banners"
             android:orientation="vertical"
             android:layout_width="match_parent"
