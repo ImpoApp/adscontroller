@@ -60,6 +60,7 @@
             android:id="@+id/fkpolicyimgbnr"
             android:layout_width="60dp"
             android:visibility="gone"
+            android:background="@drawable/ajorads"
             android:layout_alignParentBottom="true"
             android:scaleType="fitXY"
             android:alpha="0.8"
@@ -68,6 +69,7 @@
         <ImageView
             android:id="@+id/addbnr"
             android:onClick="addbnr"
+            android:background="@drawable/add"
             android:layout_alignParentBottom="true"
             android:scaleType="fitXY"
             android:layout_width="18dp"

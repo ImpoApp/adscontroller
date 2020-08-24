@@ -19,9 +19,6 @@ public class config {
     public static String Housead_banner_link = "";
     public static String Housead_privacy_policy = "";
     public static String statut = "";
-    public static String share = "";
-    public static String package_name = "";
-
 
 
     public static int interval = 1;

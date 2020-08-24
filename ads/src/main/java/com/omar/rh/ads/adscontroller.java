@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -37,11 +38,13 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
+import com.unity3d.ads.IUnityAdsListener;
+import com.unity3d.ads.UnityAds;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import static com.facebook.ads.AdSettings.IntegrationErrorMode.INTEGRATION_ERROR_CRASH_DEBUG_MODE;
@@ -63,7 +66,7 @@ import static com.omar.rh.ads.config.isFk_inter;
 import static com.omar.rh.ads.config.interval;
 import static com.omar.rh.ads.config.statut;
 
-public class adscontroller extends AppCompatActivity {
+public class adscontroller extends AppCompatActivity implements IUnityAdsListener{
 
     Context context;
     Activity activity;
@@ -100,11 +103,12 @@ public class adscontroller extends AppCompatActivity {
     public LinearLayout exfkint;
     public RelativeLayout relat;
 
-    public LinearLayout fkinterex, fk_int;
+    public LinearLayout fkinterex, housead_inter_xml;
     public RelativeLayout RelativeExFkInt;
     public Boolean expandadd = false, expandaddbnr = false;
     public LinearLayout nativecont;
     private adsCallback adsCallback;
+    private onBakcoverride onBackOverride;
 
     public adscontroller(Context context) {
         this.context = context;
@@ -117,10 +121,10 @@ public class adscontroller extends AppCompatActivity {
 
 
 //        // >> Unity
-//        unityGameID = Unity_app_id;
-//        unityInter = Unity_inter;
-//        final UnityAdsListener myAdsListener = new UnityAdsListener();
-//        UnityAds.initialize((Activity) context, unityGameID, myAdsListener, testMode);
+        unityGameID = Unity_app_id;
+        unityInter = Unity_inter;
+        final UnityAdsListener myAdsListener = new UnityAdsListener();
+        UnityAds.initialize((Activity) context, unityGameID, myAdsListener, testMode);
 
         // >> facebook
         AudienceNetworkAds.initialize(context);
@@ -131,12 +135,40 @@ public class adscontroller extends AppCompatActivity {
         interstitialAd = new InterstitialAd(context);
         interstitialAd.setAdUnitId(Admob_inter);
 
+        try {
+            fk_int_init();
+            setBanners();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
+    public interface onBakcoverride {
+        void callBack();
+    }
+
+    public adscontroller onBakcoverride(adscontroller.onBakcoverride listener) {
+        onBackOverride = listener;
+        if (isFk_inter){
+            housead_inter_xml.setVisibility(View.GONE);
+            fk_int_callback();
+        }else {
+            onBackOverride.callBack();
+        }
+        return this;
+    }
+
+
+    //    public void onBackPressedFunc() {
+//
+//    }
+
     public void fk_int_init() {
-        fk_int = this.activity.findViewById(R.id.fk_int);
+        housead_inter_xml = this.activity.findViewById(R.id.housead_inter_xml);
         View view = View.inflate(context, R.layout.fk_inter, null);
-        fk_int.addView(view);
+        housead_inter_xml.addView(view);
+        housead_inter_xml.setVisibility(View.GONE);
 
         RelativeExFkInt = this.activity.findViewById(R.id.relativeExFkInt);
         fkinterex = (LinearLayout) this.activity.findViewById(R.id.fkinterex);
@@ -179,7 +211,7 @@ public class adscontroller extends AppCompatActivity {
                 try {
                     Intent viewIntent =
                             new Intent("android.intent.action.VIEW",
-                                    Uri.parse(Housead_inter));
+                                    Uri.parse(Housead_inter_link));
                     context.startActivity(viewIntent);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -201,8 +233,9 @@ public class adscontroller extends AppCompatActivity {
         });
     }
 
+
     public void fk_int_callback() {
-        fk_int.setVisibility(View.GONE);
+        housead_inter_xml.setVisibility(View.GONE);
         RelativeExFkInt.animate().alpha(1);
         isFk_inter = false;
         adsCallback.adscall();
@@ -293,7 +326,16 @@ public class adscontroller extends AppCompatActivity {
 
     }
 
+    public void showBanners() {
+        showBannersFunction(statut);
+    }
+
     public void showBanners(String statut) {
+        showBannersFunction(statut);
+    }
+
+    private void showBannersFunction(String statut){
+
         switch (Integer.valueOf(statut)) {
             case 1:
                 admBnr();
@@ -358,22 +400,22 @@ public class adscontroller extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 break;
-//            case 3:
-//                Log.d("here: loding int unity", unityInter);
-//                try {
-//                    UnityAds.load(unityInter);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                break;
+            case 3:
+                Log.d("here: loding int unity", unityInter);
+                try {
+                    UnityAds.load(unityInter);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
         }
     }
 
-//    private void UnityInterDisplay() {
-//        if (UnityAds.isReady(unityInter)) {
-//            UnityAds.show((Activity) context, unityInter);
-//        }
-//    }
+    private void UnityInterDisplay() {
+        if (UnityAds.isReady(unityInter)) {
+            UnityAds.show((Activity) context, unityInter);
+        }
+    }
 
     public void intentStar() {
 //        Toast.makeText(context, Admob_app_id, Toast.LENGTH_SHORT).show();
@@ -432,10 +474,10 @@ public class adscontroller extends AppCompatActivity {
                     Call_New_Insertial();
                 }
                 break;
-//            case 3:
-//                UnityInterDisplay();
-//                adsCallback.adscall();
-//                break;
+            case 3:
+                UnityInterDisplay();
+                adsCallback.adscall();
+                break;
             case 4:
                 get_fk_int();
                 break;
@@ -458,51 +500,51 @@ public class adscontroller extends AppCompatActivity {
         ((LinearLayout) this.activity.findViewById(R.id.adlinear)).addView(mAdView2);
     }
 //
-//    //Unity
-//    @Override
-//    public void onUnityAdsReady(String s) {
-//
-//    }
-//
-//    @Override
-//    public void onUnityAdsStart(String s) {
-//
-//    }
-//
-//    @Override
-//    public void onUnityAdsFinish(String s, UnityAds.FinishState finishState) {
-//
-//    }
-//
-//    @Override
-//    public void onUnityAdsError(UnityAds.UnityAdsError unityAdsError, String s) {
-//
-//    }
-//
-//    // Implement the IUnityAdsListener interface methods:
-//    public class UnityAdsListener implements IUnityAdsListener {
-//
-//        @Override
-//        public void onUnityAdsReady(String placementId) {
-//            // Implement functionality for an ad being ready to show.
-//        }
-//
-//        @Override
-//        public void onUnityAdsStart(String placementId) {
-//            // Implement functionality for a user starting to watch an ad.
-//        }
-//
-//        @Override
-//        public void onUnityAdsFinish(String placementId, UnityAds.FinishState finishState) {
-//
-//        }
-//
-//        @Override
-//        public void onUnityAdsError(UnityAds.UnityAdsError error, String message) {
-//            // Implement functionality for a Unity Ads service error occurring.
-//        }
-//    }
-//    // END UNITY
+    //Unity
+    @Override
+    public void onUnityAdsReady(String s) {
+
+    }
+
+    @Override
+    public void onUnityAdsStart(String s) {
+
+    }
+
+    @Override
+    public void onUnityAdsFinish(String s, UnityAds.FinishState finishState) {
+
+    }
+
+    @Override
+    public void onUnityAdsError(UnityAds.UnityAdsError unityAdsError, String s) {
+
+    }
+
+    // Implement the IUnityAdsListener interface methods:
+    public class UnityAdsListener implements IUnityAdsListener {
+
+        @Override
+        public void onUnityAdsReady(String placementId) {
+            // Implement functionality for an ad being ready to show.
+        }
+
+        @Override
+        public void onUnityAdsStart(String placementId) {
+            // Implement functionality for a user starting to watch an ad.
+        }
+
+        @Override
+        public void onUnityAdsFinish(String placementId, UnityAds.FinishState finishState) {
+
+        }
+
+        @Override
+        public void onUnityAdsError(UnityAds.UnityAdsError error, String message) {
+            // Implement functionality for a Unity Ads service error occurring.
+        }
+    }
+    // END UNITY
 
 
     public void loadNativeFbAd() {
@@ -715,8 +757,6 @@ public class adscontroller extends AppCompatActivity {
     public void get_fk_bnr() {
         relat.setVisibility(View.VISIBLE);
         Glide.with(context).load(Housead_banner).thumbnail(0.01f).into(fakebnr);
-//        Glide.with(context).load(Fk_about_img_expand).thumbnail(0.01f).into(fkpolicyimgbnr);
-//        Glide.with(context).load(Fk_about_img).thumbnail(0.01f).into(addbnr);
     }
 
     public void getbnr() {
@@ -739,10 +779,8 @@ public class adscontroller extends AppCompatActivity {
     public void get_fk_int() {
         isFk_inter = true;
         RelativeExFkInt.setVisibility(View.VISIBLE);
-        fk_int.setVisibility(View.VISIBLE);
+        housead_inter_xml.setVisibility(View.VISIBLE);
         Glide.with(context).load(Housead_inter).thumbnail(0.01f).into(fkint);
-//        Glide.with(context).load(setting_js.get(0).getFk_about_img_expand()).thumbnail(0.01f).into(fk_policy_img);
-//        Glide.with(context).load(setting_js.get(0).getFk_about_img()).thumbnail(0.01f).into(add);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -815,7 +853,7 @@ public class adscontroller extends AppCompatActivity {
             return this;
         }
 
-        public setAds housead_inter_link(String housead_inter_link) {
+        public setAds Housead_inter_link(String housead_inter_link) {
             Housead_inter_link = housead_inter_link;
             return this;
         }
