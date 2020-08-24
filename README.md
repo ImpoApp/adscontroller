@@ -12,14 +12,13 @@
     
 >- Add maven { url 'https://jitpack.io' } to your gradle (Project) inside allprojects -> repositories like this:
 
-    allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url 'https://jitpack.io' }
-        
+     allprojects {
+     repositories {
+         google()
+         jcenter()
+         maven { url 'https://jitpack.io' }  
+     }
     }
-}
 
 <h2> MANIFEST </h2>
 
