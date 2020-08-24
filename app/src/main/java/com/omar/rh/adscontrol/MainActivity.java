@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         new adscontroller.config()
-                .statut(1)
+                .statut(2)
                 .admob_app_id("ca-app-pub-3940256099942544")
                 .admob_inter("ca-app-pub-3940256099942544/1033173712")
                 .admob_banner("ca-app-pub-3940256099942544/6300978111")
