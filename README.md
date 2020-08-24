@@ -121,10 +121,10 @@
 
     1 = ADMOB
 
-    2 = FACEBOOK AUDIENCE*
+    2 = FACEBOOK AUDIENCE
 
-    3 = UNITY ADS*
+    3 = UNITY ADS
 
-    4 = HOUSE ADS (yours)*
+    4 = HOUSE ADS (yours)
 
 </h3>
