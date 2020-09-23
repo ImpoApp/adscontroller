@@ -20,6 +20,20 @@ public class units {
     public static String Housead_privacy_policy = "";
     public static int statut = 0;
 
+    public static Boolean limitAdmobBannerClicks = false;
+    public static int bannerMaxNum = 0;
+    public static int bannerTimer = 0;
+
+
+    public static Boolean limitAdmobInterClicks = false;
+    public static int interMaxNum = 0;
+    public static int interTimer = 0;
+
+
+    public static Boolean limitAdmobNativeClicks = false;
+    public static int nativeMaxNum = 0;
+    public static int nativeTimer = 0;
+
 
     public static int interval = 1;
     public static int LoadingTime = 2000;

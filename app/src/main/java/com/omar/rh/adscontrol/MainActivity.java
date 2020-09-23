@@ -3,6 +3,7 @@ package com.omar.rh.adscontrol;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
                  //TODO function to show after ads showed or closed
                 ads.showNative(1);
                 ads.showBanners(1);
+                Intent intent = new Intent(MainActivity.this,MainActivity.class);
+                startActivity(intent);
             }
         });
     }

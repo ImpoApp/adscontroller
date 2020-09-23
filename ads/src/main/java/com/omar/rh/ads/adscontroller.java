@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -59,13 +60,23 @@ import static com.omar.rh.ads.units.Housead_inter;
 import static com.omar.rh.ads.units.Housead_privacy_policy;
 import static com.omar.rh.ads.units.Unity_app_id;
 import static com.omar.rh.ads.units.Unity_inter;
+import static com.omar.rh.ads.units.bannerMaxNum;
+import static com.omar.rh.ads.units.interMaxNum;
+import static com.omar.rh.ads.units.interTimer;
 import static com.omar.rh.ads.units.isFk_inter;
 import static com.omar.rh.ads.units.interval;
+import static com.omar.rh.ads.units.limitAdmobInterClicks;
+import static com.omar.rh.ads.units.limitAdmobNativeClicks;
+import static com.omar.rh.ads.units.nativeMaxNum;
+import static com.omar.rh.ads.units.nativeTimer;
 import static com.omar.rh.ads.units.statut;
+import static com.omar.rh.ads.units.limitAdmobBannerClicks;
+import static com.omar.rh.ads.units.bannerTimer;
 
 public class adscontroller extends AppCompatActivity implements IUnityAdsListener{
 
     public String TAG = this.getClass().getSimpleName();
+    private TinyDB tinyDB;
     Context context;
     Activity activity;
     private config config;
@@ -119,6 +130,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
     public void init() {
         activity = (Activity) context;
+        tinyDB = new TinyDB(context);
 
 //        // >> Unity
         unityGameID = Unity_app_id;
@@ -427,9 +439,31 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     public void loadInterAds() {
         switch (Integer.valueOf(statut)) {
             case 1:
-                AdRequest adRequest = new AdRequest.Builder()
-                        .build();
-                interstitialAd.loadAd(adRequest);
+                if (limitAdmobInterClicks) {
+                    int interNumClick = this.tinyDB.getInt("interNumClick", 0);
+                    if (interNumClick < interMaxNum) {
+                        AdRequest adRequest = new AdRequest.Builder()
+                                .build();
+                        interstitialAd.loadAd(adRequest);
+                    } else {
+                        long interSavedTime = this.tinyDB.getLong("interTimerMili", 0L);
+                        if (System.currentTimeMillis() >= interSavedTime + (long)(interTimer * 1000)) {
+                            AdRequest adRequest = new AdRequest.Builder()
+                                    .build();
+                            interstitialAd.loadAd(adRequest);
+                        }else{
+                            try {
+                            interstitialAdfb.loadAd();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } else {
+                    AdRequest adRequest = new AdRequest.Builder()
+                            .build();
+                    interstitialAd.loadAd(adRequest);
+                }
                 break;
             case 2:
                 try {
@@ -456,7 +490,23 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
     public void intentStar(int statut) {
 //        Toast.makeText(context, Admob_app_id, Toast.LENGTH_SHORT).show();
-        immediateAds(statut);
+
+        if (limitAdmobInterClicks) {
+            int interNumClick = this.tinyDB.getInt("interNumClick", 0);
+            if (interNumClick < interMaxNum) {
+                immediateAds(statut);
+            } else {
+                long interSavedTime = this.tinyDB.getLong("interTimerMili", 0L);
+                if (System.currentTimeMillis() >= interSavedTime + (long)(interTimer * 1000)) {
+                    this.tinyDB.putInt("interNumClick", 0);
+                    immediateAds(statut);
+                }else{
+                    immediateAds(2);
+                }
+            }
+        } else {
+            immediateAds(statut);
+        }
     }
 
     public void showInter(){
@@ -543,6 +593,25 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     }
 
     public void admBnr() {
+        if (limitAdmobBannerClicks) {
+            int bannerNumClick = this.tinyDB.getInt("bannerNumClick", 0);
+            if (bannerNumClick < bannerMaxNum) {
+                calladmobBanner();
+            } else {
+                long bannerSavedTime = this.tinyDB.getLong("bannerTimerMili", 0L);
+                if (System.currentTimeMillis() >= bannerSavedTime + (long)(bannerTimer * 1000)) {
+                    this.tinyDB.putInt("bannerNumClick", 0);
+                    calladmobBanner();
+                }else{
+                    this.showBanners(2);
+                }
+            }
+        } else {
+            calladmobBanner();
+        }
+    }
+
+    private void calladmobBanner(){
         bnlinear.setVisibility(View.VISIBLE);
         addRequest2 = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
@@ -552,6 +621,16 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         // else Log state of adsize/adunit
         ((LinearLayout) this.activity.findViewById(R.id.adlinear)).removeAllViews();
         ((LinearLayout) this.activity.findViewById(R.id.adlinear)).addView(mAdView2);
+
+        mAdView2.setAdListener(new AdListener() {
+            public void onAdLeftApplication() {
+                tinyDB.putInt("bannerNumClick", tinyDB.getInt("bannerNumClick", 0) + 1);
+                if (tinyDB.getInt("bannerNumClick", 0) >= bannerMaxNum) {
+                    tinyDB.putLong("bannerTimerMili", System.currentTimeMillis());
+                        showBanners(2);
+                }
+            }
+        });
     }
 //
     //Unity
@@ -698,6 +777,25 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
 
     public void Admob_native_loader() {
+        if (limitAdmobNativeClicks) {
+            int nativeNumClick = this.tinyDB.getInt("nativeNumClick", 0);
+            if (nativeNumClick < nativeMaxNum) {
+                calladmvtv();
+            } else {
+                long nativeSavedTime = this.tinyDB.getLong("nativeTimerMili", 0L);
+                if (System.currentTimeMillis() >= nativeSavedTime + (long)(nativeTimer * 1000)) {
+                    this.tinyDB.putInt("nativeNumClick", 0);
+                    calladmvtv();
+                }else{
+                    this.showNative(2);
+                }
+            }
+        } else {
+            calladmvtv();
+        }
+
+    }
+    private void calladmvtv(){
         scrollViewFb.setVisibility(View.GONE);
         scrollViewAdm.setVisibility(View.VISIBLE);
         AdLoader adLoader = new AdLoader.Builder(context, Admob_native)
@@ -719,6 +817,16 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     public void onAdFailedToLoad(int i) {
                         super.onAdFailedToLoad(i);
                         scrollViewAdm.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAdLeftApplication() {
+                        super.onAdLeftApplication();
+                        tinyDB.putInt("nativeNumClick", tinyDB.getInt("nativeNumClick", 0) + 1);
+                        if (tinyDB.getInt("nativeNumClick", 0) >= bannerMaxNum) {
+                            tinyDB.putLong("nativeTimerMili", System.currentTimeMillis());
+                            showNative(2);
+                        }
                     }
                 })
                 .build();
@@ -816,6 +924,51 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
             return this;
         }
 
+        public config limitAdmobBannerClicks(Boolean limitadmobBannerClicks) {
+            limitAdmobBannerClicks = limitadmobBannerClicks;
+            return this;
+        }
+
+        public config bannerMaxNum(int banner_MaxNum) {
+            bannerMaxNum = banner_MaxNum;
+            return this;
+        }
+
+        public config bannerTimer(int bannertimer) {
+            bannerTimer = bannertimer;
+            return this;
+        }
+
+        public config limitAdmobInterClicks(Boolean limitadmobinterClicks) {
+            limitAdmobInterClicks = limitadmobinterClicks;
+            return this;
+        }
+
+        public config interMaxNum(int inter_MaxNum) {
+            interMaxNum = inter_MaxNum;
+            return this;
+        }
+
+        public config interTimer(int intertimer) {
+            interTimer = intertimer;
+            return this;
+        }
+
+        public config limitAdmobNativeClicks(Boolean limitAdmobnativeClicks) {
+            limitAdmobNativeClicks = limitAdmobnativeClicks;
+            return this;
+        }
+
+        public config nativeMaxNum(int native_MaxNum) {
+            nativeMaxNum = native_MaxNum;
+            return this;
+        }
+
+        public config nativeTimer(int nativetimer) {
+            nativeTimer = nativetimer;
+            return this;
+        }
+
         public config admob_inter(String admob_inter) {
             Admob_inter = admob_inter;
             return this;
@@ -891,4 +1044,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     }
 
 }
+
+
+/////
 
