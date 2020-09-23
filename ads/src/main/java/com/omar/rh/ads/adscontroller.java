@@ -527,6 +527,14 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                             interCallBack();
                             loadInterAds();
                         }
+
+                        @Override
+                        public void onAdLeftApplication() {
+                            tinyDB.putInt("interNumClick", tinyDB.getInt("interNumClick", 0) + 1);
+                            if (tinyDB.getInt("interNumClick", 0) >= interMaxNum) {
+                                tinyDB.putLong("interTimerMili", System.currentTimeMillis());
+                            }
+                        }
                     });
                 } else {
                     interCallBack();
@@ -603,7 +611,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     this.tinyDB.putInt("bannerNumClick", 0);
                     calladmobBanner();
                 }else{
-                    this.showBanners(2);
+                    showBanners(2);
                 }
             }
         } else {
@@ -823,7 +831,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     public void onAdLeftApplication() {
                         super.onAdLeftApplication();
                         tinyDB.putInt("nativeNumClick", tinyDB.getInt("nativeNumClick", 0) + 1);
-                        if (tinyDB.getInt("nativeNumClick", 0) >= bannerMaxNum) {
+                        if (tinyDB.getInt("nativeNumClick", 0) >= nativeMaxNum) {
                             tinyDB.putLong("nativeTimerMili", System.currentTimeMillis());
                             showNative(2);
                         }
