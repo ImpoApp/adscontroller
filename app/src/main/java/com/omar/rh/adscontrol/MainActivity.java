@@ -13,6 +13,7 @@ import com.omar.rh.ads.adscontroller;
 public class MainActivity extends AppCompatActivity {
     Context context = this;
     adscontroller ads = new adscontroller(this);
+    int ff =1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,7 +23,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         new adscontroller.config()
-                .statut(2)
+                .statut(1)
+                .bannerMaxNum(2)
+                .bannerTimer(90)
+                .nativeMaxNum(2)
+                .nativeTimer(90)
+                .interMaxNum(2)
+                .interTimer(90)
+                .limitAdmobBannerClicks(false)
+                .limitAdmobInterClicks(false)
+                .limitAdmobNativeClicks(false)
                 .admob_app_id("ca-app-pub-3940256099942544")
                 .admob_inter("ca-app-pub-3940256099942544/1033173712")
                 .admob_banner("ca-app-pub-3940256099942544/6300978111")
@@ -38,22 +48,20 @@ public class MainActivity extends AppCompatActivity {
                 .Housead_banner_link("https://google.com");
 
         ads.init();
-        ads.showInter(4);
         ads.showBanners();
         ads.showNative();
     }
 
     public void clickme(View view) {
-        ads.callBack(3,new adscontroller.adsCallback() {
+        ads.callBack(2,new adscontroller.adsCallback() {
             @Override
             public void adscall() {
-                 //TODO function to show after ads showed or closed
-                ads.showNative(1);
-                ads.showBanners(1);
-                Intent intent = new Intent(MainActivity.this,MainActivity.class);
-                startActivity(intent);
+                ads.showNative();
+                ads.showBanners();
             }
         });
+//                Intent intent = new Intent(MainActivity.this,MainActivity.class);
+//                startActivity(intent);
     }
 
     @Override

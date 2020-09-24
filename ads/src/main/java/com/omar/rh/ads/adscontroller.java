@@ -16,7 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.facebook.ads.Ad;
@@ -109,6 +111,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     public LinearLayout bnlinear, adContainer, separator, mybanners;
     int hasAdView = 0;
     private com.facebook.ads.AdView adView;
+    Boolean isFaceBanner = false;
 
 
     public ImageView fkint, fakebnr, fk_policy_img, add, fkpolicyimgbnr, addbnr;
@@ -381,6 +384,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         if (isBanner) {
             switch (Integer.valueOf(statut)) {
                 case 1:
+                    isFaceBanner = false;
                     admBnr();
     //                admNativeLoader();
                     relat.setVisibility(View.GONE);
@@ -388,16 +392,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     separator.setVisibility(View.VISIBLE);
                     break;
                 case 2:
-                    relat.setVisibility(View.GONE);
-                    adContainer.setVisibility(View.VISIBLE);
-                    separator.setVisibility(View.VISIBLE);
-                    bnlinear.setVisibility(View.GONE);
-                    if (hasAdView == 0) {
-                        adContainer.removeAllViews();
-                        adContainer.addView(adView);
-                        adView.loadAd();
-                        hasAdView = 1;
-                    }
+                    callFaceBanner();
                     break;
                 case 4:
                     bnlinear.setVisibility(View.GONE);
@@ -417,6 +412,54 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     separator.setVisibility(View.GONE);
             }
         }
+    }
+
+    private void callFaceBanner() {
+        isFaceBanner = true;
+        relat.setVisibility(View.GONE);
+        bnlinear.setVisibility(View.GONE);
+        adContainer.setVisibility(View.VISIBLE);
+        separator.setVisibility(View.VISIBLE);
+        // Request an ad
+        com.facebook.ads.AdListener adListener = new com.facebook.ads.AdListener() {
+            @Override
+            public void onError(Ad ad, AdError adError) {
+                // Ad error callback
+                Log.d(TAG,"listener: onError with facebook "+isFaceBanner);
+
+                if (hasAdView != 1) {
+                    adContainer.setVisibility(View.GONE);
+                    separator.setVisibility(View.GONE);
+                    adContainer.removeAllViews();
+                }
+            }
+
+            @Override
+            public void onAdLoaded(Ad ad) {
+                // Ad loaded callback
+                if (isFaceBanner){
+                adContainer.removeAllViews();
+                adContainer.addView(adView);
+                }
+                Log.d(TAG,"listener: onAdLoaded with facebook "+isFaceBanner);
+            }
+
+            @Override
+            public void onAdClicked(Ad ad) {
+                // Ad clicked callback
+                Log.d(TAG,"listener: onAdClicked");
+            }
+
+            @Override
+            public void onLoggingImpression(Ad ad) {
+                // Ad impression logged callback
+                Log.d(TAG,"listener: onLoggingImpression with facebook "+isFaceBanner);
+                hasAdView = 1;
+            }
+        };
+
+        adView.loadAd(adView.buildLoadAdConfig().withAdListener(adListener).build());
+        Log.d(TAG," inside banner fb statut 2");
     }
 
     public interface adsCallback {
@@ -452,6 +495,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                                     .build();
                             interstitialAd.loadAd(adRequest);
                         }else{
+                            Log.d("here","in fb load with statuts"+ statut+" time "+System.currentTimeMillis() +" :: "+ interSavedTime + (long)(interTimer * 1000));
                             try {
                             interstitialAdfb.loadAd();
                             } catch (Exception e) {
@@ -491,22 +535,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     public void intentStar(int statut) {
 //        Toast.makeText(context, Admob_app_id, Toast.LENGTH_SHORT).show();
 
-        if (limitAdmobInterClicks) {
-            int interNumClick = this.tinyDB.getInt("interNumClick", 0);
-            if (interNumClick < interMaxNum) {
-                immediateAds(statut);
-            } else {
-                long interSavedTime = this.tinyDB.getLong("interTimerMili", 0L);
-                if (System.currentTimeMillis() >= interSavedTime + (long)(interTimer * 1000)) {
-                    this.tinyDB.putInt("interNumClick", 0);
-                    immediateAds(statut);
-                }else{
-                    immediateAds(2);
-                }
-            }
-        } else {
-            immediateAds(statut);
-        }
+        immediateAds(statut);
     }
 
     public void showInter(){
@@ -520,61 +549,30 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     private void immediateAds(int statut) {
         switch (statut) {
             case 1:
-                if (interstitialAd != null && interstitialAd.isLoaded()) {
-                    interstitialAd.show();
-                    interstitialAd.setAdListener(new AdListener() {
-                        public void onAdClosed() {
-                            interCallBack();
-                            loadInterAds();
-                        }
+                if (limitAdmobInterClicks) {
+                    int interNumClick = this.tinyDB.getInt("interNumClick", 0);
+                    if (interNumClick < interMaxNum) {
+                        Log.d("here:", "in adm 1 if immediate with statuts"+statut + "interNumclick =" +interNumClick + "InterMax = "+interMaxNum);
+                        callAdmobInter();
+                    } else {
+                        long interSavedTime = this.tinyDB.getLong("interTimerMili", 0L);
+                        if (System.currentTimeMillis() >= interSavedTime + (long)(interTimer * 1000)) {
+                            tinyDB.putInt("interNumClick", 0);
+                            Log.d("here:", "in adm = immediate with statuts"+statut+ "interNumclick =" +interNumClick + "InterMax = "+interMaxNum);
+                            callAdmobInter();
+                        }else{
+                            Log.d("here:", "in fb immediate with statuts"+statut+ "interNumclick =" +interNumClick + "InterMax = "+interMaxNum +" time "+System.currentTimeMillis() +" :: "+ interSavedTime + (long)(interTimer * 1000));
 
-                        @Override
-                        public void onAdLeftApplication() {
-                            tinyDB.putInt("interNumClick", tinyDB.getInt("interNumClick", 0) + 1);
-                            if (tinyDB.getInt("interNumClick", 0) >= interMaxNum) {
-                                tinyDB.putLong("interTimerMili", System.currentTimeMillis());
-                            }
+                            callFaceInter();
                         }
-                    });
+                    }
                 } else {
-                    interCallBack();
-                    loadInterAds();
+                    callAdmobInter();
                 }
+
                 break;
             case 2:
-                if (interstitialAdfb.isAdLoaded()) {
-                    interstitialAdfb.show();
-                    interstitialAdfb.setAdListener(new InterstitialAdListener() {
-                        @Override
-                        public void onError(Ad ad, AdError adError) {
-                        }
-
-                        @Override
-                        public void onAdLoaded(Ad ad) {
-                        }
-
-                        @Override
-                        public void onAdClicked(Ad ad) {
-                        }
-
-                        @Override
-                        public void onLoggingImpression(Ad ad) {
-                        }
-
-                        @Override
-                        public void onInterstitialDisplayed(Ad ad) {
-                        }
-
-                        @Override
-                        public void onInterstitialDismissed(Ad ad) {
-                            interCallBack();
-                            loadInterAds();
-                        }
-                    });
-                } else {
-                    interCallBack();
-                    loadInterAds();
-                }
+                callFaceInter();
                 break;
             case 3:
                 UnityInterDisplay();
@@ -600,18 +598,83 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         }
     }
 
+    private void callAdmobInter(){
+        if (interstitialAd != null && interstitialAd.isLoaded()) {
+            interstitialAd.show();
+            interstitialAd.setAdListener(new AdListener() {
+                public void onAdClosed() {
+                    interCallBack();
+                    loadInterAds();
+                }
+
+                @Override
+                public void onAdLeftApplication() {
+                    if (limitAdmobInterClicks) {
+                        tinyDB.putInt("interNumClick", tinyDB.getInt("interNumClick", 0) + 1);
+                        if (tinyDB.getInt("interNumClick", 0) >= interMaxNum) {
+                            tinyDB.putLong("interTimerMili", System.currentTimeMillis());
+                            Log.d(TAG, "in adm reached onleft immediate with statuts" + statut + "inter max: " + interMaxNum);
+                        }
+                    }
+                }
+            });
+        } else {
+            interCallBack();
+            loadInterAds();
+        }
+    }
+
+    private void callFaceInter(){
+        if (interstitialAdfb.isAdLoaded()) {
+            interstitialAdfb.show();
+            interstitialAdfb.setAdListener(new InterstitialAdListener() {
+                @Override
+                public void onError(Ad ad, AdError adError) {
+                }
+
+                @Override
+                public void onAdLoaded(Ad ad) {
+                }
+
+                @Override
+                public void onAdClicked(Ad ad) {
+                }
+
+                @Override
+                public void onLoggingImpression(Ad ad) {
+                }
+
+                @Override
+                public void onInterstitialDisplayed(Ad ad) {
+                }
+
+                @Override
+                public void onInterstitialDismissed(Ad ad) {
+                    interCallBack();
+                    loadInterAds();
+                }
+            });
+        } else {
+            interCallBack();
+            loadInterAds();
+        }
+    }
     public void admBnr() {
         if (limitAdmobBannerClicks) {
+            Log.d(TAG,"banner fb limite = true");
             int bannerNumClick = this.tinyDB.getInt("bannerNumClick", 0);
             if (bannerNumClick < bannerMaxNum) {
+                Log.d(TAG,"banner fb bannerNumClick < bannerMaxNum "+bannerNumClick +" < "+ bannerMaxNum);
                 calladmobBanner();
             } else {
                 long bannerSavedTime = this.tinyDB.getLong("bannerTimerMili", 0L);
                 if (System.currentTimeMillis() >= bannerSavedTime + (long)(bannerTimer * 1000)) {
+                    Log.d(TAG,"banner fb System.currentTimeMillis() >= bannerSavedTime "+System.currentTimeMillis()+ " >= " + bannerSavedTime + (long)(bannerTimer * 1000));
                     this.tinyDB.putInt("bannerNumClick", 0);
                     calladmobBanner();
                 }else{
-                    showBanners(2);
+                    Log.d(TAG,"banner fb show facebook bnr");
+                    callFaceBanner();
                 }
             }
         } else {
@@ -632,10 +695,14 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
         mAdView2.setAdListener(new AdListener() {
             public void onAdLeftApplication() {
-                tinyDB.putInt("bannerNumClick", tinyDB.getInt("bannerNumClick", 0) + 1);
-                if (tinyDB.getInt("bannerNumClick", 0) >= bannerMaxNum) {
-                    tinyDB.putLong("bannerTimerMili", System.currentTimeMillis());
-                        showBanners(2);
+                if (limitAdmobBannerClicks) {
+                    tinyDB.putInt("bannerNumClick", tinyDB.getInt("bannerNumClick", 0) + 1);
+                    Log.d(TAG, "banner fb onAdLeftApplication bannerMaxNum= " + bannerMaxNum);
+                    if (tinyDB.getInt("bannerNumClick", 0) >= bannerMaxNum) {
+                        tinyDB.putLong("bannerTimerMili", System.currentTimeMillis());
+                        Log.d(TAG, "banner fb onAdLeftApplication " + tinyDB.getInt("bannerNumClick", 0) + " >= " + bannerMaxNum);
+                        callFaceBanner();
+                    }
                 }
             }
         });
@@ -786,19 +853,25 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
     public void Admob_native_loader() {
         if (limitAdmobNativeClicks) {
+            Log.d(TAG,"Inside admob native is lmited check = "+limitAdmobNativeClicks);
             int nativeNumClick = this.tinyDB.getInt("nativeNumClick", 0);
             if (nativeNumClick < nativeMaxNum) {
+                Log.d(TAG,"Inside admob native nativeNumClick < nativeMaxNum");
                 calladmvtv();
             } else {
+                Log.d(TAG,"Inside admob native nativeNumClick is not < nativeMaxNum");
                 long nativeSavedTime = this.tinyDB.getLong("nativeTimerMili", 0L);
                 if (System.currentTimeMillis() >= nativeSavedTime + (long)(nativeTimer * 1000)) {
+                    Log.d(TAG,"Inside admob native System.currentTimeMillis() >= nativeSavedTime");
                     this.tinyDB.putInt("nativeNumClick", 0);
                     calladmvtv();
                 }else{
+                    Log.d(TAG,"Inside admob native System.currentTimeMillis() is not >= nativeSavedTime and show facebook");
                     this.showNative(2);
                 }
             }
         } else {
+            Log.d(TAG,"Inside admob native is not lmited check = "+limitAdmobNativeClicks);
             calladmvtv();
         }
 
@@ -830,10 +903,12 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     @Override
                     public void onAdLeftApplication() {
                         super.onAdLeftApplication();
-                        tinyDB.putInt("nativeNumClick", tinyDB.getInt("nativeNumClick", 0) + 1);
-                        if (tinyDB.getInt("nativeNumClick", 0) >= nativeMaxNum) {
-                            tinyDB.putLong("nativeTimerMili", System.currentTimeMillis());
-                            showNative(2);
+                        if (limitAdmobNativeClicks) {
+                            tinyDB.putInt("nativeNumClick", tinyDB.getInt("nativeNumClick", 0) + 1);
+                            if (tinyDB.getInt("nativeNumClick", 0) > nativeMaxNum) {
+                                tinyDB.putLong("nativeTimerMili", System.currentTimeMillis());
+                                showNative(2);
+                            }
                         }
                     }
                 })
