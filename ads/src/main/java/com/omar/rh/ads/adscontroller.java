@@ -386,7 +386,6 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                 case 1:
                     isFaceBanner = false;
                     admBnr();
-    //                admNativeLoader();
                     relat.setVisibility(View.GONE);
                     adContainer.setVisibility(View.GONE);
                     separator.setVisibility(View.VISIBLE);
@@ -438,10 +437,13 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
             public void onAdLoaded(Ad ad) {
                 // Ad loaded callback
                 if (isFaceBanner){
+                    relat.setVisibility(View.GONE);
+                    bnlinear.setVisibility(View.GONE);
+                    adContainer.setVisibility(View.VISIBLE);
+                    separator.setVisibility(View.VISIBLE);
                 adContainer.removeAllViews();
                 adContainer.addView(adView);
                 }
-                Log.d(TAG,"listener: onAdLoaded with facebook "+isFaceBanner);
             }
 
             @Override
