@@ -483,13 +483,13 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         switch (Integer.valueOf(statut)) {
             case 1:
                 if (limitAdmobInterClicks) {
-                    int interNumClick = this.tinyDB.getInt("interNumClick", 0);
+                    int interNumClick = tinyDB.getInt("interNumClick", 0);
                     if (interNumClick < interMaxNum) {
                         AdRequest adRequest = new AdRequest.Builder()
                                 .build();
                         interstitialAd.loadAd(adRequest);
                     } else {
-                        long interSavedTime = this.tinyDB.getLong("interTimerMili", 0L);
+                        long interSavedTime = tinyDB.getLong("interTimerMili", 0L);
                         if (System.currentTimeMillis() >= interSavedTime + (long)(interTimer * 1000)) {
                             AdRequest adRequest = new AdRequest.Builder()
                                     .build();
@@ -550,12 +550,12 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         switch (statut) {
             case 1:
                 if (limitAdmobInterClicks) {
-                    int interNumClick = this.tinyDB.getInt("interNumClick", 0);
+                    int interNumClick = tinyDB.getInt("interNumClick", 0);
                     if (interNumClick < interMaxNum) {
                         Log.d("here:", "in adm 1 if immediate with statuts"+statut + "interNumclick =" +interNumClick + "InterMax = "+interMaxNum);
                         callAdmobInter();
                     } else {
-                        long interSavedTime = this.tinyDB.getLong("interTimerMili", 0L);
+                        long interSavedTime = tinyDB.getLong("interTimerMili", 0L);
                         if (System.currentTimeMillis() >= interSavedTime + (long)(interTimer * 1000)) {
                             tinyDB.putInt("interNumClick", 0);
                             Log.d("here:", "in adm = immediate with statuts"+statut+ "interNumclick =" +interNumClick + "InterMax = "+interMaxNum);
@@ -662,15 +662,15 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     public void admBnr() {
         if (limitAdmobBannerClicks) {
             Log.d(TAG,"banner fb limite = true");
-            int bannerNumClick = this.tinyDB.getInt("bannerNumClick", 0);
+            int bannerNumClick = tinyDB.getInt("bannerNumClick", 0);
             if (bannerNumClick < bannerMaxNum) {
                 Log.d(TAG,"banner fb bannerNumClick < bannerMaxNum "+bannerNumClick +" < "+ bannerMaxNum);
                 calladmobBanner();
             } else {
-                long bannerSavedTime = this.tinyDB.getLong("bannerTimerMili", 0L);
+                long bannerSavedTime = tinyDB.getLong("bannerTimerMili", 0L);
                 if (System.currentTimeMillis() >= bannerSavedTime + (long)(bannerTimer * 1000)) {
                     Log.d(TAG,"banner fb System.currentTimeMillis() >= bannerSavedTime "+System.currentTimeMillis()+ " >= " + bannerSavedTime + (long)(bannerTimer * 1000));
-                    this.tinyDB.putInt("bannerNumClick", 0);
+                    tinyDB.putInt("bannerNumClick", 0);
                     calladmobBanner();
                 }else{
                     Log.d(TAG,"banner fb show facebook bnr");
@@ -854,16 +854,16 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
     public void Admob_native_loader() {
         if (limitAdmobNativeClicks) {
             Log.d(TAG,"Inside admob native is lmited check = "+limitAdmobNativeClicks);
-            int nativeNumClick = this.tinyDB.getInt("nativeNumClick", 0);
+            int nativeNumClick = tinyDB.getInt("nativeNumClick", 0);
             if (nativeNumClick < nativeMaxNum) {
                 Log.d(TAG,"Inside admob native nativeNumClick < nativeMaxNum");
                 calladmvtv();
             } else {
                 Log.d(TAG,"Inside admob native nativeNumClick is not < nativeMaxNum");
-                long nativeSavedTime = this.tinyDB.getLong("nativeTimerMili", 0L);
+                long nativeSavedTime = tinyDB.getLong("nativeTimerMili", 0L);
                 if (System.currentTimeMillis() >= nativeSavedTime + (long)(nativeTimer * 1000)) {
                     Log.d(TAG,"Inside admob native System.currentTimeMillis() >= nativeSavedTime");
-                    this.tinyDB.putInt("nativeNumClick", 0);
+                    tinyDB.putInt("nativeNumClick", 0);
                     calladmvtv();
                 }else{
                     Log.d(TAG,"Inside admob native System.currentTimeMillis() is not >= nativeSavedTime and show facebook");
@@ -905,7 +905,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                         super.onAdLeftApplication();
                         if (limitAdmobNativeClicks) {
                             tinyDB.putInt("nativeNumClick", tinyDB.getInt("nativeNumClick", 0) + 1);
-                            if (tinyDB.getInt("nativeNumClick", 0) > nativeMaxNum) {
+                            if (tinyDB.getInt("nativeNumClick", 0) >= nativeMaxNum) {
                                 tinyDB.putLong("nativeTimerMili", System.currentTimeMillis());
                                 showNative(2);
                             }
