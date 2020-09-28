@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                 .admob_native("ca-app-pub-3940256099942544/2247696110")
                 .fb_inter("")
                 .Fb_banner("")
-                .fb_native("")
+                .fb_native("IMG_16_9_APP_INSTALL#760988004308874_760990247641983")
                 .Unity_app_id("")
                 .unity_inter("")
                 .housead_banner("")

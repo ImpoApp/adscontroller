@@ -100,7 +100,6 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
     // Natives
     FrameLayout nativeAdLayoutAdm;
-    ScrollView scrollViewAdm, scrollViewFb;
     private com.facebook.ads.NativeAd nativeAd;
     private NativeAdLayout nativeAdLayout, nativecountainer;
     private LinearLayout adViewNativeFb;
@@ -266,8 +265,6 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
             View view = View.inflate(context, R.layout.nativecountainer, null);
             nativecont.addView(view);
             nativeAdLayout = this.activity.findViewById(R.id.native_ad_container);
-            scrollViewFb = this.activity.findViewById(R.id.scrollViewFb);
-            scrollViewAdm = this.activity.findViewById(R.id.scrollViewAdm);
             nativeAdLayoutAdm = this.activity.findViewById(R.id.id_native_ad);
             isNative = true;
         } catch (Exception e) {
@@ -297,8 +294,8 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     loadNativeFbAd();
                     break;
                 default:
-                    scrollViewAdm.setVisibility(View.GONE);
-                    scrollViewFb.setVisibility(View.GONE);
+                    nativeAdLayoutAdm.setVisibility(View.GONE);
+                    nativeAdLayout.setVisibility(View.GONE);
 
             }
         }
@@ -760,8 +757,8 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
 
     public void loadNativeFbAd() {
-        scrollViewAdm.setVisibility(View.GONE);
-        scrollViewFb.setVisibility(View.VISIBLE);
+        nativeAdLayoutAdm.setVisibility(View.GONE);
+        nativeAdLayout.setVisibility(View.VISIBLE);
         nativeAd = new com.facebook.ads.NativeAd(context, Fb_native);
 
         nativeAd.setAdListener(new NativeAdListener() {
@@ -881,8 +878,8 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
 
     }
     private void calladmvtv(){
-        scrollViewFb.setVisibility(View.GONE);
-        scrollViewAdm.setVisibility(View.VISIBLE);
+        nativeAdLayout.setVisibility(View.GONE);
+        nativeAdLayoutAdm.setVisibility(View.VISIBLE);
         AdLoader adLoader = new AdLoader.Builder(context, Admob_native)
                 .forUnifiedNativeAd(new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
                     @Override
@@ -901,7 +898,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     @Override
                     public void onAdFailedToLoad(int i) {
                         super.onAdFailedToLoad(i);
-                        scrollViewAdm.setVisibility(View.GONE);
+                        nativeAdLayoutAdm.setVisibility(View.GONE);
                     }
 
                     @Override
