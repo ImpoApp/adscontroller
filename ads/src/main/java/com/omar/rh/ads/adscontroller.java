@@ -419,6 +419,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         bnlinear.setVisibility(View.GONE);
         adContainer.setVisibility(View.VISIBLE);
         separator.setVisibility(View.VISIBLE);
+
         // Request an ad
         com.facebook.ads.AdListener adListener = new com.facebook.ads.AdListener() {
             @Override
@@ -441,8 +442,8 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                     bnlinear.setVisibility(View.GONE);
                     adContainer.setVisibility(View.VISIBLE);
                     separator.setVisibility(View.VISIBLE);
-                adContainer.removeAllViews();
-                adContainer.addView(adView);
+                    adContainer.removeAllViews();
+                    adContainer.addView(adView);
                 }
             }
 
@@ -459,8 +460,9 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
                 hasAdView = 1;
             }
         };
-
+        adView.loadAd();
         adView.loadAd(adView.buildLoadAdConfig().withAdListener(adListener).build());
+
         Log.d(TAG," inside banner fb statut 2");
     }
 
@@ -822,7 +824,7 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         adChoicesContainer.addView(adOptionsView, 0);
 
         // Create native UI using the ad metadata.
-        AdIconView nativeAdIcon = adViewNativeFb.findViewById(R.id.native_ad_icon);
+        MediaView nativeAdIcon = adViewNativeFb.findViewById(R.id.native_ad_icon);
         TextView nativeAdTitle = adViewNativeFb.findViewById(R.id.native_ad_title);
         MediaView nativeAdMedia = adViewNativeFb.findViewById(R.id.native_ad_media);
         TextView nativeAdSocialContext = adViewNativeFb.findViewById(R.id.native_ad_social_context);
@@ -927,7 +929,6 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
         myAdView.setCallToActionView(myAdView.findViewById(R.id.ad_call_to_action));
         myAdView.setIconView(myAdView.findViewById(R.id.ad_icon));
         myAdView.setPriceView(myAdView.findViewById(R.id.ad_price));
-        myAdView.setStarRatingView(myAdView.findViewById(R.id.ad_rating));
         myAdView.setStoreView(myAdView.findViewById(R.id.ad_store));
         myAdView.setAdvertiserView(myAdView.findViewById(R.id.ad_advertiser));
 
@@ -957,11 +958,6 @@ public class adscontroller extends AppCompatActivity implements IUnityAdsListene
             ((TextView) myAdView.getPriceView()).setText(adFromGoogle.getPrice());
         }
 
-        if (adFromGoogle.getStarRating() == null) {
-            myAdView.getStarRatingView().setVisibility(View.GONE);
-        } else {
-            ((RatingBar) myAdView.getStarRatingView()).setRating(adFromGoogle.getStarRating().floatValue());
-        }
 
         if (adFromGoogle.getStore() == null) {
             myAdView.getStoreView().setVisibility(View.GONE);
